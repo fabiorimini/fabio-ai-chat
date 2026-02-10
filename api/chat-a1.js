@@ -1,6 +1,20 @@
 export default async function handler(req, res) {
+  // Permettiamo solo POST per la chat
+  if (req.method === "GET") {
+    return res.status(200).json({
+      info: "API online. Use POST with { message: \"...\" }"
+    });
+  }
+
   try {
-    const userMessage = req.body.message || "";
+    const body = req.body || {};
+    const userMessage = body.message || "";
+
+    if (!userMessage) {
+      return res.status(400).json({
+        error: "Missing 'message' in request body"
+      });
+    }
 
     const prompt = `
 You are an English teacher for beginners (A1 level).
@@ -48,3 +62,4 @@ Student message: ${userMessage}
     });
   }
 }
+
