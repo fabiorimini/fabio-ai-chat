@@ -38,7 +38,7 @@ Student message: ${userMessage}
     }
 
     const response = await fetch(
-      "https://router.huggingface.co/hf-inference/models/facebook/bart-large-mnli",
+      ""https://router.huggingface.co/hf-inference/models/gpt2",
       {
         method: "POST",
         headers: {
@@ -75,6 +75,7 @@ Student message: ${userMessage}
     });
   }
 }
+
 
 
 
