@@ -35,7 +35,7 @@ Student message: ${userMessage}
     const hfKey = process.env.HF_API_KEY;
 
     const response = await fetch(
-      "https://router.huggingface.co/mistralai/Mistral-7B-Instruct-v0.2",
+    "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2",
       {
         method: "POST",
         headers: {
@@ -71,4 +71,5 @@ Student message: ${userMessage}
     });
   }
 }
+
 
