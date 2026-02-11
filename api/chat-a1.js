@@ -38,7 +38,7 @@ Student message: ${userMessage}
     }
 
     const response = await fetch(
-      "https://router.huggingface.co/hf-inference/models/mistralai/Mistral-7B-Instruct-v0.2",
+      "https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct",
       {
         method: "POST",
         headers: {
@@ -75,3 +75,4 @@ Student message: ${userMessage}
     });
   }
 }
+
