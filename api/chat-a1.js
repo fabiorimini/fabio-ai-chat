@@ -5,7 +5,7 @@ export default async function handler(req, res) {
 
   const { prompt } = req.body;
 
-  // La chiave viene letta dalle variabili d'ambiente su Vercel
+  // La tua chiave OpenRouter (inserita su Vercel)
   const openrouterKey = process.env.OPENROUTER_API_KEY;
 
   try {
@@ -16,12 +16,12 @@ export default async function handler(req, res) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "deepseek/deepseek-chat",
+        model: "tngtech/deepseek-r1t2-chimera:free",
         messages: [
           { role: "system", content: "You are a helpful assistant." },
           { role: "user", content: prompt }
         ],
-        max_tokens: 120,
+        max_tokens: 200,
         temperature: 0.7
       })
     });
