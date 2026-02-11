@@ -38,7 +38,7 @@ Student message: ${userMessage}
     }
 
     const response = await fetch(
-      "https://router.huggingface.co/hf-inference/models/tiiuae/falcon-7b-instruct",
+      "https://router.huggingface.co/hf-inference/models/facebook/bart-large-mnli",
       {
         method: "POST",
         headers: {
@@ -75,5 +75,6 @@ Student message: ${userMessage}
     });
   }
 }
+
 
 
