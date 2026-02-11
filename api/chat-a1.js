@@ -25,7 +25,7 @@ export default async function handler(req, res) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "mistralai/mistral-nemo",
+        model: "tngtech/deepseek-r1t2-chimera:free",
         messages: [
           { role: "user", content: prompt }
         ]
@@ -44,6 +44,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: error.message });
   }
 }
+
 
 
 
