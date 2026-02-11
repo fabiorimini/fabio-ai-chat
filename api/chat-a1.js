@@ -38,7 +38,7 @@ Student message: ${userMessage}
     }
 
     const response = await fetch(
-      "https://router.huggingface.co/hf-inference/models/bigscience/bloomz-560m",
+      "https://router.huggingface.co/hf-inference/models/google/flan-t5-base",
       {
         method: "POST",
         headers: {
@@ -75,6 +75,7 @@ Student message: ${userMessage}
     });
   }
 }
+
 
 
 
