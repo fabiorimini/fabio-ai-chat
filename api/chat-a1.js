@@ -38,7 +38,7 @@ Student message: ${userMessage}
     }
 
     const response = await fetch(
-      "https://router.huggingface.co/hf-inference/models/google/gemma-2b",
+      "https://router.huggingface.co/hf-inference/models/google/gemma-7b",
       {
         method: "POST",
         headers: {
@@ -75,6 +75,7 @@ Student message: ${userMessage}
     });
   }
 }
+
 
 
 
