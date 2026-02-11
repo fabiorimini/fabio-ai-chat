@@ -25,7 +25,7 @@ export default async function handler(req, res) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "google/gemma-2-9b-it:free",
+        model: "mistralai/mistral-nemo:free",
         messages: [
           { role: "user", content: prompt }
         ]
@@ -44,5 +44,6 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: error.message });
   }
 }
+
 
 
