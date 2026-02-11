@@ -1,86 +1,41 @@
 export default async function handler(req, res) {
-  // --- CORS ---
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
-  if (req.method === "GET") {
-    return res.status(200).json({
-      info: "API online. Use POST with { message: \"...\" }"
-    });
-  }
+  const { prompt } = req.body;
+
+  // La chiave viene letta dalle variabili d'ambiente su Vercel
+  const openrouterKey = process.env.OPENROUTER_API_KEY;
 
   try {
-    const body = req.body || {};
-    const userMessage = body.message || "";
-
-    if (!userMessage) {
-      return res.status(400).json({
-        error: "Missing 'message' in request body"
-      });
-    }
-
-    const prompt = `
-You are an English teacher for beginners (A1 level).
-Use very simple words and short sentences.
-Correct mistakes gently.
-Student message: ${userMessage}
-`;
-
-    const hfKey = process.env.HF_API_KEY;
-
-    if (!hfKey) {
-      return res.status(500).json({ error: "HF_API_KEY non trovata" });
-    }
-
-    const response = await fetch(
-      "https://router.huggingface.co/hf-inference/models/google/flan-t5-base",
-      {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${hfKey}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          inputs: prompt,
-          parameters: {
-            max_new_tokens: 120,
-            temperature: 0.4
-          }
-        })
-      }
-    );
-
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${openrouterKey}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "deepseek/deepseek-chat",
+        messages: [
+          { role: "system", content: "You are a helpful assistant." },
+          { role: "user", content: prompt }
+        ],
+        max_tokens: 120,
+        temperature: 0.7
+      })
+    });
 
     const data = await response.json();
 
-    if (!Array.isArray(data) || !data[0]?.generated_text) {
-      return res.status(500).json({
-        error: "Unexpected model response",
-        raw: data
-      });
+    if (data.error) {
+      return res.status(500).json({ error: data.error });
     }
 
-    res.status(200).json({
-      reply: data[0].generated_text
-    });
+    const reply = data.choices?.[0]?.message?.content || "Nessuna risposta generata.";
+    return res.status(200).json({ reply });
 
   } catch (error) {
-    res.status(500).json({
-      error: error.message
-    });
+    return res.status(500).json({ error: error.message });
   }
 }
-
-
-
-
-
-
-
-
-
