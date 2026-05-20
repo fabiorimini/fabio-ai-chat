@@ -15,7 +15,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { prompt, model = "openai/gpt-3.5-turbo:free", max_tokens = 120, temperature = 0.3 } = req.body;
+    const { prompt, model = "deepseek/deepseek-v4-flash:free", max_tokens = 120, temperature = 0.3 } = req.body;
     const openrouterKey = process.env.OPENROUTER_API_KEY;
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
