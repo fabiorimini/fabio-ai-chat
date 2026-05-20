@@ -14,10 +14,10 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { prompt } = req.body;
-  const openrouterKey = process.env.OPENROUTER_API_KEY;
-
   try {
+    const { prompt, model = "stepfun/step-3.5-flash", max_tokens = 120, temperature = 0.3 } = req.body;
+    const openrouterKey = process.env.OPENROUTER_API_KEY;
+
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -25,28 +25,25 @@ export default async function handler(req, res) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "stepfun/step-3.5-flash:free",
-        messages: [
-          { role: "user", content: prompt }
-        ]
+        model,
+        messages: [{ role: "user", content: prompt }],
+        max_tokens,
+        temperature
       })
     });
 
     const data = await response.json();
 
     if (!response.ok) {
+      console.error("Errore OpenRouter:", data);
       return res.status(500).json({ error: data.error || "Errore API" });
     }
 
-    return res.status(200).json({ reply: data.choices[0].message.content });
+    const reply = data.choices?.[0]?.message?.content || "Nessuna risposta dal modello.";
+    return res.status(200).json({ reply });
 
   } catch (error) {
+    console.error("Errore server:", error);
     return res.status(500).json({ error: error.message });
   }
 }
-
-
-
-
-
-
