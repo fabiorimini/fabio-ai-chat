@@ -1,49 +1,57 @@
 export default async function handler(req, res) {
-  // --- CORS ---
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-  // --- Preflight request ---
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
-
-  // --- Only POST allowed ---
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
   try {
-    const { prompt, model: "openai/gpt-3.5-turbo:free", max_tokens = 120, temperature = 0.3 } = req.body;
-    const openrouterKey = process.env.OPENROUTER_API_KEY;
+    if (req.method !== "POST") {
+      return res.status(405).json({ error: "Metodo non consentito" });
+    }
+
+    const { prompt, model, max_tokens = 150, temperature = 0.5 } = req.body;
+
+    if (!prompt) {
+      return res.status(400).json({ error: "Prompt mancante" });
+    }
+
+    // Modello OpenRouter FREE senza limiti
+    const safeModel = model || "google/gemini-2.0-flash-lite-preview-02-05:free";
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${openrouterKey}`,
+        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model,
+        model: safeModel,
         messages: [{ role: "user", content: prompt }],
         max_tokens,
         temperature
       })
     });
 
-    const data = await response.json();
-
     if (!response.ok) {
-      console.error("Errore OpenRouter:", data);
-      return res.status(500).json({ error: data.error || "Errore API" });
+      const errorText = await response.text();
+      return res.status(500).json({
+        error: "Errore OpenRouter",
+        details: errorText
+      });
     }
 
-    const reply = data.choices?.[0]?.message?.content || "Nessuna risposta dal modello.";
+    const data = await response.json();
+
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      return res.status(500).json({
+        error: "Risposta non valida dal modello",
+        raw: data
+      });
+    }
+
+    const reply = data.choices[0].message.content;
+
     return res.status(200).json({ reply });
 
-  } catch (error) {
-    console.error("Errore server:", error);
-    return res.status(500).json({ error: error.message });
+  } catch (err) {
+    return res.status(500).json({
+      error: "Errore interno del server",
+      details: err.toString()
+    });
   }
 }
