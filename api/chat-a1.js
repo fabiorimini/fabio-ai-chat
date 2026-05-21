@@ -4,14 +4,17 @@ export default async function handler(req, res) {
       return res.status(405).json({ error: "Metodo non consentito" });
     }
 
-    const { prompt, model, max_tokens = 150, temperature = 0.5 } = req.body;
+    // Leggiamo il body SENZA destructuring
+    const body = req.body;
 
-    if (!prompt) {
+    if (!body || !body.prompt) {
       return res.status(400).json({ error: "Prompt mancante" });
     }
 
-    // Modello OpenRouter FREE senza limiti
-    const safeModel = model || "google/gemini-2.0-flash-lite-preview-02-05:free";
+    const prompt = body.prompt;
+    const model = body.model || "google/gemini-2.0-flash-lite-preview-02-05:free";
+    const max_tokens = body.max_tokens || 150;
+    const temperature = body.temperature || 0.5;
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
@@ -20,10 +23,10 @@ export default async function handler(req, res) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: safeModel,
+        model: model,
         messages: [{ role: "user", content: prompt }],
-        max_tokens,
-        temperature
+        max_tokens: max_tokens,
+        temperature: temperature
       })
     });
 
@@ -45,7 +48,6 @@ export default async function handler(req, res) {
     }
 
     const reply = data.choices[0].message.content;
-
     return res.status(200).json({ reply });
 
   } catch (err) {
