@@ -14,7 +14,6 @@ export default async function handler(req, res) {
       return res.status(405).json({ error: "Metodo non consentito" });
     }
 
-    // Leggiamo il body SENZA destructuring
     const body = req.body;
 
     if (!body || !body.prompt) {
@@ -23,10 +22,10 @@ export default async function handler(req, res) {
 
     const prompt = body.prompt;
     const model = body.model || "openrouter/free";   // fallback sicuro
-    const max_tokens = body.max_tokens || 800;       // aumentato per risposte complete
+    const max_tokens = body.max_tokens || 800;
     const temperature = body.temperature || 0.5;
 
-
+    // ✅ Chiamata a OpenRouter
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -43,7 +42,7 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      return res.status(500).json({
+      return res.status(response.status).json({
         error: "Errore OpenRouter",
         details: errorText
       });
@@ -51,14 +50,16 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+    // ✅ Estrarre la risposta in modo sicuro
+    const reply = data?.choices?.[0]?.message?.content;
+
+    if (!reply) {
       return res.status(500).json({
         error: "Risposta non valida dal modello",
         raw: data
       });
     }
 
-    const reply = data.choices[0].message.content;
     return res.status(200).json({ reply });
 
   } catch (err) {
