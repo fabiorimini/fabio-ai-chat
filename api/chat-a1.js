@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     }
 
     const prompt = body.prompt;
-    const model = body.model || "deepseek/deepseek-v4-flash:free";
+    const model = body.model || "meta-llama/llama-3.3-70b-instruct:free";
     const max_tokens = body.max_tokens || 150;
     const temperature = body.temperature || 0.5;
 
