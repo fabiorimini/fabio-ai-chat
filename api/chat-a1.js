@@ -1,4 +1,14 @@
 export default async function handler(req, res) {
+  // ✅ Header CORS
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  // ✅ Gestione preflight OPTIONS
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
   try {
     if (req.method !== "POST") {
       return res.status(405).json({ error: "Metodo non consentito" });
@@ -23,10 +33,10 @@ export default async function handler(req, res) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: model,
+        model,
         messages: [{ role: "user", content: prompt }],
-        max_tokens: max_tokens,
-        temperature: temperature
+        max_tokens,
+        temperature
       })
     });
 
