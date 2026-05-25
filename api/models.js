@@ -9,7 +9,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    // ✅ Chiamata a OpenRouter con la tua API key da Environment Variables
     const response = await fetch("https://openrouter.ai/api/v1/models", {
       headers: {
         "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
@@ -27,8 +26,11 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
+    // ✅ OpenRouter restituisce { data: [...] }
+    const models = data.data || [];
+
     // ✅ Filtra solo i modelli free
-    const freeModels = data.filter(m => m.id.includes(":free"));
+    const freeModels = models.filter(m => m.id.includes(":free"));
 
     return res.status(200).json(freeModels);
 
@@ -39,4 +41,3 @@ export default async function handler(req, res) {
     });
   }
 }
-
