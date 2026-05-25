@@ -22,9 +22,10 @@ export default async function handler(req, res) {
     }
 
     const prompt = body.prompt;
-    const model = body.model || "deepseek/deepseek-v4-flash:free";
-    const max_tokens = body.max_tokens || 150;
+    const model = body.model || "openrouter/free";   // fallback sicuro
+    const max_tokens = body.max_tokens || 800;       // aumentato per risposte complete
     const temperature = body.temperature || 0.5;
+
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
