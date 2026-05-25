@@ -1,4 +1,5 @@
 export default async function handler(req, res) {
+  // ✅ Header CORS per permettere chiamate dal tuo frontend
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -8,6 +9,7 @@ export default async function handler(req, res) {
   }
 
   try {
+    // ✅ Chiamata a OpenRouter con la tua API key da Environment Variables
     const response = await fetch("https://openrouter.ai/api/v1/models", {
       headers: {
         "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
@@ -17,15 +19,23 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      return res.status(500).json({ error: "Errore OpenRouter", details: errorText });
+      return res.status(500).json({
+        error: "Errore OpenRouter",
+        details: errorText
+      });
     }
 
     const data = await response.json();
-    // Filtra solo i modelli free
+
+    // ✅ Filtra solo i modelli free
     const freeModels = data.filter(m => m.id.includes(":free"));
+
     return res.status(200).json(freeModels);
 
   } catch (err) {
-    return res.status(500).json({ error: "Errore interno", details: err.toString() });
+    return res.status(500).json({
+      error: "Errore interno del server",
+      details: err.toString()
+    });
   }
 }
