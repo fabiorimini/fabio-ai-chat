@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  // ✅ Header CORS per permettere chiamate dal tuo frontend
+  // ✅ Header CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -19,7 +19,7 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      return res.status(500).json({
+      return res.status(response.status).json({
         error: "Errore OpenRouter",
         details: errorText
       });
@@ -39,3 +39,4 @@ export default async function handler(req, res) {
     });
   }
 }
+
